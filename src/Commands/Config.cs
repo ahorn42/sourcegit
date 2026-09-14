@@ -78,6 +78,16 @@ namespace SourceGit.Commands
             return rs.StdOut.Trim();
         }
 
+        // Same as GetAsync, but resolves the value the way git resolves path-typed config
+        // entries (e.g. expands a leading `~`). Use this for keys like `commit.template`.
+        public async Task<string> GetPathAsync(string key)
+        {
+            Args = $"config --path {key}";
+
+            var rs = await ReadToEndAsync().ConfigureAwait(false);
+            return rs.StdOut.Trim();
+        }
+
         public async Task<bool> SetAsync(string key, string value, bool allowEmpty = false)
         {
             var scope = _isLocal ? "--local" : "--global";

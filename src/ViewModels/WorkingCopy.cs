@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SourceGit.ViewModels
@@ -103,6 +104,7 @@ namespace SourceGit.ViewModels
                     else
                     {
                         CommitMessage = string.Empty;
+                        _autoLoadedGitCommitTemplate = false;
                         ResetAuthor = false;
                     }
 
@@ -571,6 +573,7 @@ namespace SourceGit.ViewModels
                 log.Complete();
 
                 CommitMessage = string.Empty;
+                _autoLoadedGitCommitTemplate = false;
                 IsCommitting = false;
             }
             else
@@ -591,6 +594,7 @@ namespace SourceGit.ViewModels
                 log.Complete();
 
                 CommitMessage = string.Empty;
+                _autoLoadedGitCommitTemplate = false;
                 IsCommitting = false;
             }
             else
@@ -611,6 +615,7 @@ namespace SourceGit.ViewModels
                 log.Complete();
 
                 CommitMessage = string.Empty;
+                _autoLoadedGitCommitTemplate = false;
                 IsCommitting = false;
             }
             else
@@ -697,6 +702,7 @@ namespace SourceGit.ViewModels
             {
                 UseAmend = false;
                 CommitMessage = string.Empty;
+                _autoLoadedGitCommitTemplate = false;
 
                 if (autoPush && _repo.Remotes.Count > 0)
                 {
@@ -811,12 +817,80 @@ namespace SourceGit.ViewModels
                 return;
 
             if (_inProgressContext is not RebaseInProgress { } rebasing)
+            {
+                if (_inProgressContext == null)
+                    LoadGitCommitTemplate(force: false);
+
                 return;
+            }
 
             if (LoadCommitMessageFromFile(Path.Combine(_repo.GitDir, "rebase-merge", "message")))
                 return;
 
             CommitMessage = new Commands.QueryCommitFullMessage(_repo.FullPath, rebasing.StoppedAt.SHA).GetResult();
+        }
+
+        // Mirrors `git commit`'s prefill from `commit.template`. When `force` is false (the
+        // automatic case, e.g. after a commit/merge/rebase resets the box), it only applies
+        // once per "box became empty" transition - not on every repo refresh - and only
+        // while nothing else already claims the box. `force` is for the toolbox's reload
+        // button - an explicit user action that may overwrite an already-loaded template.
+        private void LoadGitCommitTemplate(bool force)
+        {
+            if (_isLoadingGitCommitTemplate || (!force && (_autoLoadedGitCommitTemplate || !string.IsNullOrEmpty(_commitMessage))))
+                return;
+
+            _isLoadingGitCommitTemplate = true;
+            if (!force)
+                _autoLoadedGitCommitTemplate = true;
+
+            Task.Run(async () =>
+            {
+                var content = await ResolveGitCommitTemplateAsync().ConfigureAwait(false);
+
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (!string.IsNullOrEmpty(content) && (force || string.IsNullOrEmpty(_commitMessage)))
+                        CommitMessage = content;
+
+                    _isLoadingGitCommitTemplate = false;
+                });
+            });
+        }
+
+        public void ReloadGitCommitTemplate() => LoadGitCommitTemplate(force: true);
+
+        private async Task<string> ResolveGitCommitTemplateAsync()
+        {
+            try
+            {
+                var file = await new Commands.Config(_repo.FullPath).GetPathAsync("commit.template").ConfigureAwait(false);
+                if (string.IsNullOrEmpty(file))
+                    return string.Empty;
+
+                if (!Path.IsPathRooted(file))
+                    file = Native.OS.GetAbsPath(_repo.FullPath, file);
+
+                if (!File.Exists(file))
+                    return string.Empty;
+
+                var raw = await File.ReadAllTextAsync(file).ConfigureAwait(false);
+                if (string.IsNullOrEmpty(raw))
+                    return string.Empty;
+
+                var cleanup = await new Commands.Config(_repo.FullPath).GetAsync("commit.cleanup").ConfigureAwait(false);
+                if (cleanup.Equals("verbatim", StringComparison.OrdinalIgnoreCase))
+                    return raw;
+
+                return await Commands.StripCommitMessageComments
+                    .RunAsync(_repo.FullPath, raw, !cleanup.Equals("whitespace", StringComparison.OrdinalIgnoreCase))
+                    .ConfigureAwait(false);
+            }
+            catch
+            {
+                // Unreadable/unresolvable template: behave as if commit.template were unset.
+                return string.Empty;
+            }
         }
 
         private bool LoadCommitMessageFromFile(string file)
@@ -942,5 +1016,7 @@ namespace SourceGit.ViewModels
 
         private bool _hasUnsolvedConflicts = false;
         private InProgressContext _inProgressContext = null;
+        private bool _isLoadingGitCommitTemplate = false;
+        private bool _autoLoadedGitCommitTemplate = false;
     }
 }

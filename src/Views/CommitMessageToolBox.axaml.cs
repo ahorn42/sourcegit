@@ -500,7 +500,7 @@ namespace SourceGit.Views
                 var foreground = this.FindResource("Brush.FG1") as IBrush;
                 var menu = new ContextMenu() { MaxWidth = 480 };
 
-                var gitTemplate = await new Commands.Config(repo.FullPath).GetAsync("commit.template");
+                var gitTemplate = await new Commands.Config(repo.FullPath).GetPathAsync("commit.template");
                 var templateCount = repo.Settings.CommitTemplates.Count;
                 if (templateCount == 0 && string.IsNullOrEmpty(gitTemplate))
                 {
@@ -552,8 +552,10 @@ namespace SourceGit.Views
                         gitTemplateItem.Icon = icon;
                         gitTemplateItem.Click += (_, ev) =>
                         {
-                            if (File.Exists(gitTemplate))
-                                vm.CommitMessage = File.ReadAllText(gitTemplate);
+                            // Goes through the same resolution as auto-load (`~`/relative-path
+                            // handling, `commit.cleanup`-aware comment stripping via `git
+                            // stripspace`) instead of a raw read, so the two paths agree.
+                            vm.ReloadGitCommitTemplate();
                             ev.Handled = true;
                         };
                         menu.Items.Add(gitTemplateItem);
