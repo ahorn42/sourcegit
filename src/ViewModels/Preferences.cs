@@ -253,6 +253,16 @@ namespace SourceGit.ViewModels
             set;
         } = false;
 
+        // SetProperty (not a plain auto-property) so bound UI - e.g. the reload button's
+        // visibility - updates live when this is toggled from the commit template menu.
+        // Named with a "Git" prefix to distinguish it from the unrelated, pre-existing
+        // per-repo Models.CommitTemplate (user-defined message snippets).
+        public bool AutoLoadGitCommitTemplate
+        {
+            get => _autoLoadGitCommitTemplate;
+            set => SetProperty(ref _autoLoadGitCommitTemplate, value);
+        }
+
         public int AutoFetchInterval
         {
             get;
@@ -833,6 +843,7 @@ namespace SourceGit.ViewModels
         private bool _useTwoColumnsLayoutInHistories = false;
         private bool _displayTimeAsPeriodInHistories = false;
         private bool _useSideBySideDiff = false;
+        private bool _autoLoadGitCommitTemplate = true;
         private bool _ignoreWhitespaceChangesInDiff = false;
         private bool _ignoreCRAtEOLInDiff = true;
         private bool _useSyntaxHighlighting = false;

@@ -562,6 +562,23 @@ namespace SourceGit.Views
                     }
                 }
 
+                var autoLoadTemplate = new MenuItem();
+                autoLoadTemplate.Header = App.Text("WorkingCopy.AutoLoadGitCommitTemplate");
+                if (ViewModels.Preferences.Instance.AutoLoadGitCommitTemplate)
+                {
+                    var checkIcon = this.CreateMenuIcon("Icons.Check");
+                    checkIcon.Margin = new Thickness(0, 2, 0, 0);
+                    autoLoadTemplate.Icon = checkIcon;
+                }
+                autoLoadTemplate.Click += (_, ev) =>
+                {
+                    var pref = ViewModels.Preferences.Instance;
+                    pref.AutoLoadGitCommitTemplate = !pref.AutoLoadGitCommitTemplate;
+                    pref.Save();
+                    ev.Handled = true;
+                };
+                menu.Items.Add(autoLoadTemplate);
+
                 menu.Items.Add(new MenuItem() { Header = "-" });
 
                 var historiesCount = repo.UIStates.RecentCommitMessages.Count;
@@ -625,6 +642,14 @@ namespace SourceGit.Views
                 menu.Closed += (_, _) => button.IsEnabled = true;
                 menu.Open(button);
             }
+
+            e.Handled = true;
+        }
+
+        private void OnReloadGitCommitTemplate(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.WorkingCopy vm)
+                vm.ReloadGitCommitTemplate();
 
             e.Handled = true;
         }

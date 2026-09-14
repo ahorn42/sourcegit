@@ -818,7 +818,7 @@ namespace SourceGit.ViewModels
 
             if (_inProgressContext is not RebaseInProgress { } rebasing)
             {
-                if (_inProgressContext == null)
+                if (_inProgressContext == null && Preferences.Instance.AutoLoadGitCommitTemplate)
                     LoadGitCommitTemplate(force: false);
 
                 return;

@@ -692,6 +692,7 @@ $1, $2, … Werte der Eingabe-Steuerelemente</x:String>
   <x:String x:Key="Text.Preferences.General.UseCompactBranchNames" xml:space="preserve">Kompakte Branch-Namen im Commit-Graphen verwenden</x:String>
   <x:String x:Key="Text.Preferences.General.UseGitHubStyleAvatar" xml:space="preserve">Standard-Avatar im GitHub-Stil generieren</x:String>
   <x:String x:Key="Text.Preferences.Git" xml:space="preserve">GIT</x:String>
+  <x:String x:Key="Text.Preferences.Git.AutoLoadCommitTemplate" xml:space="preserve">commit.template automatisch laden</x:String>
   <x:String x:Key="Text.Preferences.Git.CRLF" xml:space="preserve">Aktiviere Auto-CRLF</x:String>
   <x:String x:Key="Text.Preferences.Git.DefaultCloneDir" xml:space="preserve">Standard Klon-Ordner</x:String>
   <x:String x:Key="Text.Preferences.Git.Email" xml:space="preserve">Benutzer-E-Mail</x:String>
@@ -988,6 +989,7 @@ $1, $2, … Werte der Eingabe-Steuerelemente</x:String>
   <x:String x:Key="Text.WorkingCopy.AddToGitIgnore.SingleFile" xml:space="preserve">Ignoriere nur diese Datei</x:String>
   <x:String x:Key="Text.WorkingCopy.AddToGitIgnore.UntrackedInSameFolder" xml:space="preserve">Ignoriere alle nicht-verfolgten Dateien im selben Ordner</x:String>
   <x:String x:Key="Text.WorkingCopy.Amend" xml:space="preserve">Nachbesserung</x:String>
+  <x:String x:Key="Text.WorkingCopy.AutoLoadGitCommitTemplate" xml:space="preserve">commit.template automatisch laden</x:String>
   <x:String x:Key="Text.WorkingCopy.CanStageTip" xml:space="preserve">Du kannst diese Datei jetzt stagen.</x:String>
   <x:String x:Key="Text.WorkingCopy.ClearCommitHistories" xml:space="preserve">Verlauf löschen</x:String>
   <x:String x:Key="Text.WorkingCopy.ClearCommitHistories.Confirm" xml:space="preserve">Soll wirklich der Verlauf aller Commit-Nachrichten gelöscht werden? Dies kann nicht rückgängig gemacht werden.</x:String>
@@ -1011,6 +1013,7 @@ $1, $2, … Werte der Eingabe-Steuerelemente</x:String>
   <x:String x:Key="Text.WorkingCopy.NoCommitHistories" xml:space="preserve">KEINE BISHERIGEN COMMIT-NACHRICHTEN</x:String>
   <x:String x:Key="Text.WorkingCopy.NoCommitTemplates" xml:space="preserve">KEINE COMMIT-VORLAGEN</x:String>
   <x:String x:Key="Text.WorkingCopy.NoVerify" xml:space="preserve">Ohne Überprüfung</x:String>
+  <x:String x:Key="Text.WorkingCopy.ReloadGitCommitTemplate" xml:space="preserve">Von commit.template neu laden</x:String>
   <x:String x:Key="Text.WorkingCopy.ResetAuthor" xml:space="preserve">Autor zurücksetzen</x:String>
   <x:String x:Key="Text.WorkingCopy.SignOff" xml:space="preserve">Abzeichnen</x:String>
   <x:String x:Key="Text.WorkingCopy.Staged" xml:space="preserve">GESTAGED</x:String>
